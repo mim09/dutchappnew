@@ -27,7 +27,7 @@ export default function ListeningLab({ lines }: { lines: Line[] }) {
   useEffect(() => () => { stop.current = true; }, []);
 
   async function play(l: Line) {
-    try { await playTts(l.text, l.voice, speed); } catch { setErr("Audio niet beschikbaar. Controleer de spraakinstellingen."); throw new Error("audio"); }
+    try { await playTts(l.text, l.voice, speed); } catch { setErr("Geen Nederlandse stem beschikbaar. Gebruik Microsoft Edge of voeg Nederlands toe in de taalinstellingen."); throw new Error("audio"); }
   }
 
   async function playAll() {

@@ -1,5 +1,4 @@
 "use server";
-import { redirect } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase/server";
 
 type Wrong = { tag: string; prompt: string; given: string; expected: string; explanation: string };
@@ -9,19 +8,20 @@ const SKILL: Record<string, string> = {
   speaking: "speaking", reading: "reading", writing: "writing", revision: "revision", assessment: "revision",
 };
 
-export async function completeLesson(p: { lessonId: string; score: number; wrong: Wrong[]; seconds: number }) {
+export async function completeLesson(p: { lessonId: string; score: number; wrong: Wrong[]; seconds: number }): Promise<{ ok: true } | { ok: false; error: string }> {
   const sb = await supabaseServer();
   const { data: auth } = await sb.auth.getUser();
-  if (!auth.user) redirect("/login");
+  if (!auth.user) return { ok: false, error: "Je bent niet ingelogd. Log opnieuw in." };
   const uid = auth.user.id;
 
   const { data: lesson, error } = await sb.from("lessons").select("kind, body").eq("id", p.lessonId).single();
-  if (error || !lesson) throw new Error("lesson not found");
+  if (error || !lesson) return { ok: false, error: `Les niet gevonden: ${error?.message ?? ""}` };
 
   const score = Math.min(1, Math.max(0, p.score));
-  await sb.from("lesson_progress").upsert({
+  const { error: progErr } = await sb.from("lesson_progress").upsert({
     user_id: uid, lesson_id: p.lessonId, status: "completed", score, completed_at: new Date().toISOString(),
   });
+  if (progErr) return { ok: false, error: `Opslaan mislukt: ${progErr.message}` };
 
   await sb.from("study_log").insert({
     user_id: uid, skill: SKILL[lesson.kind] ?? "input", seconds: Math.max(30, Math.round(p.seconds)),
@@ -47,5 +47,5 @@ export async function completeLesson(p: { lessonId: string; score: number; wrong
       );
     }
   }
-  redirect("/today");
+  return { ok: true };
 }

@@ -7,13 +7,17 @@ export default function AudioButton({
 }: { text: string; voice?: string; label?: string; showSpeed?: boolean }) {
   const [speed, setSpeed] = useState<"slow" | "normal" | "fast">("normal");
   const [state, setState] = useState<"idle" | "loading" | "error">("idle");
+  const [msg, setMsg] = useState("");
 
   async function play() {
     setState("loading");
     try {
       await playTts(text, voice, speed);
       setState("idle");
-    } catch {
+    } catch (e) {
+      setMsg(e instanceof Error && e.message === "no-dutch-voice"
+        ? "Geen Nederlandse stem op dit apparaat. Gebruik Microsoft Edge of voeg Nederlands toe in de taalinstellingen."
+        : "Audio niet beschikbaar");
       setState("error");
     }
   }
@@ -32,7 +36,7 @@ export default function AudioButton({
           <option value="fast">Snel</option>
         </select>
       )}
-      {state === "error" && <span className="text-xs text-red-600">Audio niet beschikbaar</span>}
+      {state === "error" && <span className="text-xs text-red-600">{msg}</span>}
     </span>
   );
 }

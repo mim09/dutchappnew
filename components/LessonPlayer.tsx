@@ -1,5 +1,6 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import AudioButton from "./AudioButton";
 import { completeLesson } from "@/app/lesson/actions";
 import { isCorrect, expectedText, type Exercise } from "@/lib/check";
@@ -20,10 +21,13 @@ export type LessonData = {
 type Result = { correct: boolean; given: string };
 
 export default function LessonPlayer({ lesson }: { lesson: LessonData }) {
-  const started = useRef(Date.now());
+  const started = useRef(0);
+  useEffect(() => { started.current = performance.now(); }, []);
   const [showText, setShowText] = useState(true);
   const [results, setResults] = useState<Record<string, Result>>({});
-  const [saving, setSaving] = useState(false);
+  const [save, setSave] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [saveErr, setSaveErr] = useState("");
+  const router = useRouter();
 
   const exercises: { key: string; ex: Exercise }[] = [];
   lesson.body.sections.forEach((s, si) => {
@@ -32,8 +36,8 @@ export default function LessonPlayer({ lesson }: { lesson: LessonData }) {
   const done = exercises.every((e) => results[e.key]);
   const score = exercises.length ? exercises.filter((e) => results[e.key]?.correct).length / exercises.length : 1;
 
-  async function finish() {
-    setSaving(true);
+  async function persist() {
+    setSave("saving"); setSaveErr("");
     const wrong = exercises.filter((e) => results[e.key] && !results[e.key].correct).map((e) => ({
       tag: e.ex.tag,
       prompt: e.ex.kind === "dictation" ? "Dictee" : e.ex.prompt,
@@ -41,11 +45,22 @@ export default function LessonPlayer({ lesson }: { lesson: LessonData }) {
       expected: expectedText(e.ex),
       explanation: e.ex.explanation,
     }));
-    await completeLesson({
-      lessonId: lesson.id, score, wrong,
-      seconds: Math.min(7200, Math.round((Date.now() - started.current) / 1000)),
-    });
+    try {
+      const r = await completeLesson({
+        lessonId: lesson.id, score, wrong,
+        seconds: Math.min(7200, Math.round((performance.now() - started.current) / 1000)),
+      });
+      if (r.ok) setSave("saved"); else { setSave("error"); setSaveErr(r.error); }
+    } catch {
+      setSave("error"); setSaveErr("Opslaan mislukt. Controleer je verbinding en probeer opnieuw.");
+    }
   }
+
+  // Save as soon as the last exercise is answered, so progress never depends on one more click.
+  useEffect(() => {
+    if (done && save === "idle") persist();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [done]);
 
   return (
     <div className="space-y-8">
@@ -116,10 +131,21 @@ export default function LessonPlayer({ lesson }: { lesson: LessonData }) {
         );
       })}
 
-      <button disabled={!done || saving} onClick={finish}
-        className="rounded bg-black text-white px-4 py-2 disabled:opacity-40 dark:bg-white dark:text-black">
-        {saving ? "Opslaan..." : done ? `Les afronden (${Math.round(score * 100)}%)` : "Maak eerst alle oefeningen"}
-      </button>
+      {!done && <p className="text-sm text-neutral-500">Maak alle oefeningen om de les op te slaan.</p>}
+      {save === "saving" && <p className="text-sm text-neutral-500">Opslaan...</p>}
+      {save === "saved" && (
+        <div className="space-y-2">
+          <p className="text-sm text-green-700">Les opgeslagen ({Math.round(score * 100)}% goed).</p>
+          <button onClick={() => { router.push("/today"); router.refresh(); }}
+            className="rounded bg-black text-white px-4 py-2 dark:bg-white dark:text-black">Naar de volgende les</button>
+        </div>
+      )}
+      {save === "error" && (
+        <div className="space-y-2">
+          <p className="text-sm text-red-600">{saveErr}</p>
+          <button onClick={persist} className="rounded border px-4 py-2 text-sm">Opnieuw proberen</button>
+        </div>
+      )}
     </div>
   );
 }
