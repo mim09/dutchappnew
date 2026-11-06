@@ -21,3 +21,14 @@ export async function signOut() {
   await sb.auth.signOut();
   redirect("/login");
 }
+
+export async function deleteAccount(confirm: string): Promise<{ error: string } | undefined> {
+  if (confirm.trim().toUpperCase() !== "VERWIJDER") return { error: "Typ VERWIJDER om te bevestigen." };
+  const sb = await supabaseServer();
+  const { data } = await sb.auth.getUser();
+  if (!data.user) redirect("/login");
+  const { error } = await sb.rpc("delete_my_account");
+  if (error) return { error: `Account verwijderen is mislukt: ${error.message}` };
+  await sb.auth.signOut().catch(() => null);
+  redirect("/login");
+}

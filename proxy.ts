@@ -19,10 +19,10 @@ export async function proxy(req: NextRequest) {
   );
   const { data } = await supabase.auth.getUser();
   const path = req.nextUrl.pathname;
-  const isPublic = path.startsWith("/login") || path.startsWith("/auth");
+  const isPublic = path.startsWith("/login") || path.startsWith("/auth") || path.startsWith("/privacy");
   if (!data.user && !isPublic) return NextResponse.redirect(new URL("/login", req.url));
   if (data.user && path.startsWith("/login")) return NextResponse.redirect(new URL("/", req.url));
   return res;
 }
 
-export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|manifest.webmanifest).*)"] };
+export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|icons/|manifest.webmanifest|.well-known/).*)"] };

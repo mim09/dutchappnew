@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import Shell from "@/components/Shell";
 import ThemeToggle from "@/components/ThemeToggle";
+import DeleteAccount from "@/components/DeleteAccount";
+import Link from "next/link";
 import { supabaseServer } from "@/lib/supabase/server";
 import { saveSettings, signOut } from "./actions";
 
@@ -15,6 +17,8 @@ export default function Page() {
       <h2 className="text-lg font-semibold mt-8 mb-2">Thema</h2>
       <ThemeToggle />
       <form action={signOut} className="mt-8"><button className="rounded border px-4 py-2 text-sm">Uitloggen</button></form>
+      <p className="mt-6 text-sm"><Link href="/privacy" className="underline">Privacyverklaring</Link></p>
+      <DeleteAccount />
     </Shell>
   );
 }
