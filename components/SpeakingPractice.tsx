@@ -88,7 +88,7 @@ export default function SpeakingPractice() {
   return (
     <div className="space-y-4 max-w-2xl">
       <select value={scenario} disabled={turns.length > 0} onChange={(e) => setScenario(e.target.value)}
-        className="rounded border p-2 text-sm dark:bg-neutral-900">
+        className="field">
         {Object.keys(SCENARIOS).map((k) => <option key={k}>{k}</option>)}
       </select>
       <p className="text-sm text-neutral-500">{SCENARIOS[scenario]} Je krijgt feedback aan het einde van het gesprek.</p>
@@ -104,15 +104,15 @@ export default function SpeakingPractice() {
       {!fb && (
         <div className="space-y-2">
           <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={3}
-            className="w-full rounded border p-2 text-sm dark:bg-neutral-900" placeholder="Spreek of typ je antwoord" />
+            className="w-full field" placeholder="Spreek of typ je antwoord" />
           <div className="flex gap-2 flex-wrap">
             {canRecord && (
-              <button onClick={recording ? stop : start} className="rounded border px-3 py-2 text-sm">
+              <button onClick={recording ? stop : start} className="btn btn-ghost">
                 {recording ? "Stop opname" : "Neem op"}
               </button>
             )}
-            <button disabled={!draft.trim()} onClick={send} className="rounded bg-black text-white px-3 py-2 text-sm disabled:opacity-40 dark:bg-white dark:text-black">Verstuur</button>
-            <button disabled={learnerTurns < 3} onClick={finish} className="rounded border px-3 py-2 text-sm disabled:opacity-40">
+            <button disabled={!draft.trim()} onClick={send} className="btn btn-primary">Verstuur</button>
+            <button disabled={learnerTurns < 3} onClick={finish} className="btn btn-ghost">
               Rond af en krijg feedback {learnerTurns < 3 ? `(nog ${3 - learnerTurns} beurten)` : ""}
             </button>
           </div>

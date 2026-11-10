@@ -1,14 +1,14 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import Shell from "@/components/Shell";
-import { supabaseServer } from "@/lib/supabase/server";
+import Skeleton from "@/components/Skeleton";
+import { requireUser } from "@/lib/auth";
 
 export default function Page() {
   return (
     <Shell>
       <h1 className="text-2xl font-semibold mb-4">Mijn leerpad</h1>
-      <Suspense fallback={<p className="text-sm text-neutral-500">Laden...</p>}>
+      <Suspense fallback={<Skeleton />}>
         <Content />
       </Suspense>
     </Shell>
@@ -16,14 +16,12 @@ export default function Page() {
 }
 
 async function Content() {
-  const sb = await supabaseServer();
-  const { data: auth } = await sb.auth.getUser();
-  if (!auth.user) redirect("/login");
+  const { sb, uid } = await requireUser();
   const [{ data: levels }, { data: mods }, { data: done }, { data: profile }] = await Promise.all([
     sb.from("levels").select("code, position, objectives").order("position"),
     sb.from("modules").select("id, level_code, position, title, description, units(id, position, title, lessons(id, position, title, kind))").order("position"),
     sb.from("lesson_progress").select("lesson_id, score").eq("status", "completed"),
-    sb.from("profiles").select("current_level").eq("id", auth.user.id).single(),
+    sb.from("profiles").select("current_level").eq("id", uid).single(),
   ]);
   const score = new Map((done ?? []).map((d) => [d.lesson_id, d.score as number | null]));
 
@@ -35,7 +33,7 @@ async function Content() {
       {(levels ?? []).map((lv: any) => {
         const m = (mods ?? []).filter((x: any) => x.level_code === lv.code);
         return (
-          <section key={lv.code} className="rounded border border-neutral-200 dark:border-neutral-800 p-4">
+          <section key={lv.code} className="card">
             <h2 className="text-lg font-semibold">{lv.code}</h2>
             <ul className="text-sm text-neutral-500 list-disc pl-5 mb-2">
               {(lv.objectives ?? []).map((o: string, i: number) => <li key={i}>{o}</li>)}

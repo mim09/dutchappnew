@@ -1,14 +1,14 @@
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
 import Shell from "@/components/Shell";
+import Skeleton from "@/components/Skeleton";
 import ListeningLab, { type Line } from "@/components/ListeningLab";
-import { supabaseServer } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/auth";
 
 export default function Page() {
   return (
     <Shell>
       <h1 className="text-2xl font-semibold mb-4">Luisteren</h1>
-      <Suspense fallback={<p className="text-sm text-neutral-500">Laden...</p>}>
+      <Suspense fallback={<Skeleton />}>
         <Content />
       </Suspense>
     </Shell>
@@ -16,9 +16,7 @@ export default function Page() {
 }
 
 async function Content() {
-  const sb = await supabaseServer();
-  const { data: auth } = await sb.auth.getUser();
-  if (!auth.user) redirect("/login");
+  const { sb } = await requireUser();
   const { data } = await sb.from("lessons").select("title, body").eq("kind", "listening");
   const lines: Line[] = (data ?? []).flatMap((l: any) =>
     (l.body?.sections ?? []).filter((s: any) => s.type === "dialogue")

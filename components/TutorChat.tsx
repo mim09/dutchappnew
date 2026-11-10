@@ -54,13 +54,13 @@ export default function TutorChat() {
       </div>
       <textarea value={text} onChange={(e) => setText(e.target.value)} rows={3} maxLength={2000}
         onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-        className="w-full rounded border p-2 text-sm dark:bg-neutral-900" placeholder="Typ je vraag" />
+        className="w-full field" placeholder="Typ je vraag" />
       <div className="flex gap-2 flex-wrap">
-        <button disabled={busy || !text.trim()} onClick={send} className="rounded bg-black text-white px-4 py-2 text-sm disabled:opacity-40 dark:bg-white dark:text-black">
+        <button disabled={busy || !text.trim()} onClick={send} className="btn btn-primary">
           {busy ? "Even denken..." : "Verstuur"}
         </button>
-        <button disabled={msgs.length < 2} onClick={remember} className="rounded border px-4 py-2 text-sm disabled:opacity-40">Onthoud dit gesprek</button>
-        <button onClick={fresh} className="rounded border px-4 py-2 text-sm">Nieuwe sessie</button>
+        <button disabled={msgs.length < 2} onClick={remember} className="btn btn-ghost">Onthoud dit gesprek</button>
+        <button onClick={fresh} className="btn btn-ghost">Nieuwe sessie</button>
       </div>
       {note && <p className="text-sm text-neutral-500">{note}</p>}
     </div>

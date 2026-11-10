@@ -1,22 +1,22 @@
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
 import Shell from "@/components/Shell";
+import Skeleton from "@/components/Skeleton";
 import ThemeToggle from "@/components/ThemeToggle";
 import DeleteAccount from "@/components/DeleteAccount";
 import Link from "next/link";
-import { supabaseServer } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/auth";
 import { saveSettings, signOut } from "./actions";
 
 export default function Page() {
   return (
     <Shell>
       <h1 className="text-2xl font-semibold mb-4">Instellingen</h1>
-      <Suspense fallback={<p className="text-sm text-neutral-500">Laden...</p>}>
+      <Suspense fallback={<Skeleton />}>
         <Form />
       </Suspense>
       <h2 className="text-lg font-semibold mt-8 mb-2">Thema</h2>
       <ThemeToggle />
-      <form action={signOut} className="mt-8"><button className="rounded border px-4 py-2 text-sm">Uitloggen</button></form>
+      <form action={signOut} className="mt-8"><button className="btn btn-ghost">Uitloggen</button></form>
       <p className="mt-6 text-sm"><Link href="/privacy" className="underline">Privacyverklaring</Link></p>
       <DeleteAccount />
     </Shell>
@@ -24,11 +24,9 @@ export default function Page() {
 }
 
 async function Form() {
-  const sb = await supabaseServer();
-  const { data: auth } = await sb.auth.getUser();
-  if (!auth.user) redirect("/login");
-  const { data: p } = await sb.from("profiles").select("*").eq("id", auth.user.id).single();
-  const f = "w-full rounded border p-2 text-sm dark:bg-neutral-900";
+  const { sb, uid } = await requireUser();
+  const { data: p } = await sb.from("profiles").select("*").eq("id", uid).single();
+  const f = "w-full field";
   return (
     <form action={saveSettings} className="space-y-3 max-w-md">
       <input name="display_name" defaultValue={p?.display_name ?? ""} className={f} placeholder="Naam" />
@@ -37,7 +35,7 @@ async function Form() {
         {[30, 60, 90, 120].map((m) => <option key={m} value={m}>{m} minuten per dag</option>)}
       </select>
       <textarea name="goals" defaultValue={p?.goals ?? ""} className={f} placeholder="Doelen" />
-      <button className="rounded bg-black text-white px-4 py-2 text-sm dark:bg-white dark:text-black">Opslaan</button>
+      <button className="btn btn-primary">Opslaan</button>
     </form>
   );
 }

@@ -37,7 +37,7 @@ export default function RevisionPractice() {
 
   return (
     <div className="space-y-4 max-w-2xl">
-      <button onClick={generate} disabled={busy} className="rounded bg-black text-white px-4 py-2 text-sm disabled:opacity-40 dark:bg-white dark:text-black">
+      <button onClick={generate} disabled={busy} className="btn btn-primary">
         {busy ? "Oefeningen maken..." : "Maak oefeningen op mijn zwakke punten"}
       </button>
       {msg && <p className="text-sm text-neutral-500">{msg}</p>}
@@ -46,7 +46,7 @@ export default function RevisionPractice() {
         <ExerciseCard key={i} ex={e} result={res[i]}
           onAnswer={(g) => setRes((r) => ({ ...r, [i]: { given: String(g), correct: isCorrect(e, g) } }))} />
       ))}
-      {done && !saved && <button onClick={save} className="rounded border px-4 py-2 text-sm">Sla resultaat op</button>}
+      {done && !saved && <button onClick={save} className="btn btn-ghost">Sla resultaat op</button>}
       {saved && <p className="text-sm">Opgeslagen.</p>}
     </div>
   );

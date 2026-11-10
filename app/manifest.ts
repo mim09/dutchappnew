@@ -13,8 +13,8 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: "nl",
     categories: ["education"],
     prefer_related_applications: false,
-    background_color: "#ffffff",
-    theme_color: "#0a0a0a",
+    background_color: "#4f46e5",
+    theme_color: "#4f46e5",
     screenshots: [
       { src: "/screenshots/dashboard-wide.png", sizes: "1642x871", type: "image/png", form_factor: "wide", label: "Dashboard met dagplan" },
       { src: "/screenshots/today-narrow.png", sizes: "505x732", type: "image/png", form_factor: "narrow", label: "De les van vandaag" },

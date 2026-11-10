@@ -34,14 +34,14 @@ export default function WritingForm() {
 
   return (
     <div className="space-y-4 max-w-2xl">
-      <select value={task} onChange={(e) => setTask(e.target.value)} className="rounded border p-2 text-sm dark:bg-neutral-900">
+      <select value={task} onChange={(e) => setTask(e.target.value)} className="field">
         {Object.keys(TASKS).map((k) => <option key={k} value={k}>{k}</option>)}
       </select>
       <p className="text-sm text-neutral-500">{TASKS[task]}</p>
       <textarea value={text} onChange={(e) => setText(e.target.value)} rows={10} maxLength={5000}
-        className="w-full rounded border p-3 text-sm dark:bg-neutral-900" placeholder="Schrijf hier in het Nederlands" />
+        className="w-full field" placeholder="Schrijf hier in het Nederlands" />
       <button disabled={busy || text.trim().length < 20} onClick={submit}
-        className="rounded bg-black text-white px-4 py-2 text-sm disabled:opacity-40 dark:bg-white dark:text-black">
+        className="btn btn-primary">
         {busy ? "Beoordelen..." : "Laat beoordelen"}
       </button>
       {err && <p className="text-sm text-red-600">{err}</p>}

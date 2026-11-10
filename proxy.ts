@@ -17,11 +17,12 @@ export async function proxy(req: NextRequest) {
       },
     }
   );
-  const { data } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims?.sub ? { id: data.claims.sub } : null;
   const path = req.nextUrl.pathname;
   const isPublic = path.startsWith("/login") || path.startsWith("/auth") || path.startsWith("/privacy");
-  if (!data.user && !isPublic) return NextResponse.redirect(new URL("/login", req.url));
-  if (data.user && path.startsWith("/login")) return NextResponse.redirect(new URL("/", req.url));
+  if (!user && !isPublic) return NextResponse.redirect(new URL("/login", req.url));
+  if (user && path.startsWith("/login")) return NextResponse.redirect(new URL("/", req.url));
   return res;
 }
 

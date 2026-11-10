@@ -25,12 +25,12 @@ export default function AudioButton({
   return (
     <span className="inline-flex items-center gap-2">
       <button type="button" onClick={play} disabled={state === "loading"}
-        className="rounded border border-neutral-300 dark:border-neutral-700 px-2 py-1 text-xs">
+        className="btn btn-ghost !min-h-0 !px-3 !py-1.5 !text-xs">
         {state === "loading" ? "Laden..." : label}
       </button>
       {showSpeed && (
         <select value={speed} onChange={(e) => setSpeed(e.target.value as typeof speed)}
-          className="rounded border border-neutral-300 dark:border-neutral-700 bg-transparent text-xs p-1">
+          className="field !w-auto !py-1 !text-xs">
           <option value="slow">Langzaam</option>
           <option value="normal">Normaal</option>
           <option value="fast">Snel</option>

@@ -1,13 +1,13 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import Shell from "@/components/Shell";
-import { supabaseServer } from "@/lib/supabase/server";
+import Skeleton from "@/components/Skeleton";
+import { requireUser } from "@/lib/auth";
 
 export default function Page() {
   return (
     <Shell>
-      <Suspense fallback={<p className="text-sm text-neutral-500">Laden...</p>}>
+      <Suspense fallback={<Skeleton />}>
         <Content />
       </Suspense>
     </Shell>
@@ -15,9 +15,7 @@ export default function Page() {
 }
 
 async function Content() {
-  const sb = await supabaseServer();
-  const { data: auth } = await sb.auth.getUser();
-  if (!auth.user) redirect("/login");
+  const { sb } = await requireUser();
   const [{ data: lessons }, { data: errs }] = await Promise.all([
     sb.from("lessons").select("id, title, est_minutes").eq("kind", "grammar").order("position"),
     sb.from("error_log").select("grammar_tag, learner_text, correction, explanation, created_at")
@@ -44,7 +42,7 @@ async function Content() {
       <div>
         <h2 className="text-lg font-semibold mb-2">Jouw terugkerende fouten</h2>
         {sorted.map(([tag, list]) => (
-          <div key={tag} className="rounded border border-neutral-200 dark:border-neutral-800 p-3 mb-3 text-sm">
+          <div key={tag} className="card card-sm mb-3 text-sm">
             <div className="font-semibold">{tag} ({list!.length}x)</div>
             {list!.slice(0, 2).map((e, i) => (
               <p key={i}><span className="line-through text-red-600">{e.learner_text}</span> {e.correction}</p>

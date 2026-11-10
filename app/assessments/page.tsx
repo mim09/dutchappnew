@@ -1,13 +1,13 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import Shell from "@/components/Shell";
-import { supabaseServer } from "@/lib/supabase/server";
+import Skeleton from "@/components/Skeleton";
+import { requireUser } from "@/lib/auth";
 
 export default function Page() {
   return (
     <Shell>
-      <Suspense fallback={<p className="text-sm text-neutral-500">Laden...</p>}>
+      <Suspense fallback={<Skeleton />}>
         <Content />
       </Suspense>
     </Shell>
@@ -15,9 +15,7 @@ export default function Page() {
 }
 
 async function Content() {
-  const sb = await supabaseServer();
-  const { data: auth } = await sb.auth.getUser();
-  if (!auth.user) redirect("/login");
+  const { sb } = await requireUser();
   const [{ data: list }, { data: results }] = await Promise.all([
     sb.from("assessments").select("id, kind, level_code, items"),
     sb.from("assessment_results").select("assessment_id, estimated_level, created_at").order("created_at", { ascending: false }),

@@ -1,25 +1,23 @@
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
 import Shell from "@/components/Shell";
-import { supabaseServer } from "@/lib/supabase/server";
+import Skeleton from "@/components/Skeleton";
+import { requireUser } from "@/lib/auth";
 import { currentStreak } from "@/lib/streak";
 
 export default function Page() {
   return (
     <Shell>
-      <Suspense fallback={<p className="text-sm text-neutral-500">Laden...</p>}>
+      <Suspense fallback={<Skeleton />}>
         <Content />
       </Suspense>
     </Shell>
   );
 }
 
-const card = "rounded border border-neutral-200 dark:border-neutral-800 p-4";
+const card = "card";
 
 async function Content() {
-  const sb = await supabaseServer();
-  const { data: auth } = await sb.auth.getUser();
-  if (!auth.user) redirect("/login");
+  const { sb } = await requireUser();
   const since = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
   const since60 = new Date(Date.now() - 60 * 86400000).toISOString();
 

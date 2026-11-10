@@ -1,13 +1,13 @@
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
 import Shell from "@/components/Shell";
+import Skeleton from "@/components/Skeleton";
 import VocabReview, { type Card } from "@/components/VocabReview";
-import { supabaseServer } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/auth";
 
 export default function Page() {
   return (
     <Shell>
-      <Suspense fallback={<p className="text-sm text-neutral-500">Laden...</p>}>
+      <Suspense fallback={<Skeleton />}>
         <Content />
       </Suspense>
     </Shell>
@@ -15,9 +15,7 @@ export default function Page() {
 }
 
 async function Content() {
-  const sb = await supabaseServer();
-  const { data: auth } = await sb.auth.getUser();
-  if (!auth.user) redirect("/login");
+  const { sb } = await requireUser();
   const { data } = await sb.from("user_vocab")
     .select("vocab_id, vocab_items(lemma, gloss_nl, example_nl, register, item_type)")
     .lte("due_at", new Date().toISOString()).order("due_at").limit(20);

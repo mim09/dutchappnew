@@ -80,14 +80,14 @@ export default function ListeningLab({ lines }: { lines: Line[] }) {
     report(ok, "klankonderscheid", choice, pair.heard, `${pair.a} of ${pair.b}`);
   }
 
-  const btn = "rounded border px-3 py-1 text-sm";
+  const btn = "btn btn-ghost";
   return (
     <div className="space-y-4 max-w-2xl">
       <div className="flex gap-2 flex-wrap">
         {([["luisteren", "Luisteren"], ["dictee", "Dictee"], ["invul", "Ontbrekend woord"], ["paren", "Klankparen"]] as const).map(([k, l]) => (
-          <button key={k} onClick={() => setMode(k)} className={`${btn} ${mode === k ? "bg-black text-white dark:bg-white dark:text-black" : ""}`}>{l}</button>
+          <button key={k} onClick={() => setMode(k)} className={`${btn} ${mode === k ? "!bg-[var(--brand)] !text-white !border-transparent" : ""}`}>{l}</button>
         ))}
-        <select value={speed} onChange={(e) => setSpeed(e.target.value as Speed)} className="rounded border bg-transparent text-sm p-1">
+        <select value={speed} onChange={(e) => setSpeed(e.target.value as Speed)} className="field !w-auto !py-1.5 !text-sm">
           <option value="slow">Langzaam</option><option value="normal">Normaal</option><option value="fast">Snel</option>
         </select>
       </div>
@@ -112,11 +112,11 @@ export default function ListeningLab({ lines }: { lines: Line[] }) {
       )}
 
       {(mode === "dictee" || mode === "invul") && cur && (
-        <div className="rounded border border-neutral-200 dark:border-neutral-800 p-4 space-y-3">
+        <div className="card space-y-3">
           <button className={btn} onClick={() => { setErr(""); play(cur).catch(() => {}); }}>Luister</button>
           {mode === "invul" && (cloze ? <p className="text-sm">{cloze.prompt}</p> : <p className="text-sm">Deze zin is te kort. Kies een nieuwe.</p>)}
           {mode === "dictee" && <p className="text-sm">Schrijf de hele zin op.</p>}
-          <input value={answer} disabled={!!result} onChange={(e) => setAnswer(e.target.value)} className="w-full rounded border p-2 text-sm dark:bg-neutral-900" />
+          <input value={answer} disabled={!!result} onChange={(e) => setAnswer(e.target.value)} className="w-full field" />
           <div className="flex gap-2">
             {!result && <button className={btn} disabled={!answer.trim()} onClick={checkText}>Controleer</button>}
             {result && <button className={btn} onClick={next}>Volgende</button>}
@@ -127,7 +127,7 @@ export default function ListeningLab({ lines }: { lines: Line[] }) {
       )}
 
       {mode === "paren" && pair && (
-        <div className="rounded border border-neutral-200 dark:border-neutral-800 p-4 space-y-3">
+        <div className="card space-y-3">
           <button className={btn} onClick={() => { setErr(""); playTts(pair.heard, "fenna", speed).catch(() => setErr("Audio niet beschikbaar.")); }}>Luister</button>
           <p className="text-sm">Welk woord hoor je?</p>
           <div className="flex gap-2">

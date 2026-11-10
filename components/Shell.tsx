@@ -1,43 +1,22 @@
-import Link from "next/link";
-
-const NAV: { href: string; label: string; built: boolean }[] = [
-  { href: "/", label: "Dashboard", built: true },
-  { href: "/today", label: "Today's lesson", built: true },
-  { href: "/path", label: "My learning path", built: true },
-  { href: "/listening", label: "Listening", built: true },
-  { href: "/speaking", label: "Speaking", built: true },
-  { href: "/reading", label: "Reading", built: true },
-  { href: "/writing", label: "Writing", built: true },
-  { href: "/grammar", label: "Grammar", built: true },
-  { href: "/vocabulary", label: "Vocabulary", built: true },
-  { href: "/tutor", label: "AI tutor", built: true },
-  { href: "/revision", label: "Revision", built: true },
-  { href: "/assessments", label: "Assessments", built: true },
-  { href: "/progress", label: "Progress", built: true },
-  { href: "/settings", label: "Settings", built: true },
-];
+import { Suspense } from "react";
+import { Sidebar, BottomTabs } from "./Nav";
 
 export default function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen md:flex bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
-      <nav className="md:w-56 md:min-h-screen border-b md:border-b-0 md:border-r border-neutral-200 dark:border-neutral-800 p-3">
-        <ul className="flex md:block gap-1 overflow-x-auto">
-          {NAV.map((n) => (
-            <li key={n.href} className="shrink-0">
-              {n.built ? (
-                <Link href={n.href} className="block rounded px-3 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-900">
-                  {n.label}
-                </Link>
-              ) : (
-                <span className="block rounded px-3 py-2 text-sm text-neutral-400 dark:text-neutral-600 cursor-not-allowed">
-                  {n.label}
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <main className="flex-1 p-6 max-w-4xl">{children}</main>
+    <div className="min-h-dvh">
+      <Suspense fallback={null}><Sidebar /></Suspense>
+
+      <header className="md:hidden sticky top-0 z-30 flex items-center gap-3 border-b border-[var(--line)] bg-[var(--card)]/90 px-4 pb-2 backdrop-blur"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.5rem)" }}>
+        <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 text-sm font-extrabold text-white">NL</span>
+        <span className="font-bold">Nederlands</span>
+      </header>
+
+      <main className="min-w-0 px-4 pb-28 pt-5 md:ml-64 md:px-8 md:pb-10">
+        <div className="mx-auto max-w-3xl">{children}</div>
+      </main>
+
+      <Suspense fallback={null}><BottomTabs /></Suspense>
     </div>
   );
 }

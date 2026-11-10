@@ -5,7 +5,7 @@ export type Feedback = {
   scores: Record<string, number>;
 };
 
-const box = "rounded border border-neutral-200 dark:border-neutral-800 p-3 text-sm space-y-1";
+const box = "card card-sm text-sm space-y-1";
 
 export default function FeedbackView({ fb }: { fb: Feedback }) {
   return (

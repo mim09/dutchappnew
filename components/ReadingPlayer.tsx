@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ExerciseCard } from "./LessonPlayer";
 import AudioButton from "./AudioButton";
 import { completeReading } from "@/app/reading/actions";
@@ -11,7 +11,8 @@ export type TextData = {
 };
 
 export default function ReadingPlayer({ text }: { text: TextData }) {
-  const t0 = useRef(Date.now());
+  const t0 = useRef(0);
+  useEffect(() => { t0.current = performance.now(); }, []);
   const qs = text.questions.questions ?? [];
   const [res, setRes] = useState<Record<number, { given: string; correct: boolean }>>({});
   const [busy, setBusy] = useState(false);
@@ -21,7 +22,7 @@ export default function ReadingPlayer({ text }: { text: TextData }) {
     setBusy(true);
     await completeReading({
       textId: text.id,
-      seconds: (Date.now() - t0.current) / 1000,
+      seconds: (performance.now() - t0.current) / 1000,
       wrong: qs.flatMap((q, i) =>
         res[i] && !res[i].correct
           ? [{ prompt: q.kind === "dictation" ? "Dictee" : q.prompt, given: res[i].given, expected: expectedText(q), explanation: q.explanation }]
@@ -38,7 +39,7 @@ export default function ReadingPlayer({ text }: { text: TextData }) {
       <article className="whitespace-pre-line leading-relaxed">{text.content}</article>
       <AudioButton text={text.content.replace(/\n+/g, " ").slice(0, 1000)} label="Lees voor" showSpeed />
       {text.questions.glossary?.length ? (
-        <div className="rounded border border-neutral-200 dark:border-neutral-800 p-3 text-sm space-y-1">
+        <div className="card card-sm text-sm space-y-1">
           <h2 className="font-semibold">Belangrijke woorden</h2>
           {text.questions.glossary.map((g) => (
             <div key={g.nl}><span className="font-medium">{g.nl}</span>: {g.meaning_nl}</div>
@@ -51,7 +52,7 @@ export default function ReadingPlayer({ text }: { text: TextData }) {
           onAnswer={(g) => setRes((r) => ({ ...r, [i]: { given: String(g), correct: isCorrect(q, g) } }))} />
       ))}
       <button disabled={!done || busy} onClick={finish}
-        className="rounded bg-black text-white px-4 py-2 disabled:opacity-40 dark:bg-white dark:text-black">
+        className="btn btn-primary">
         {done ? "Afronden" : "Beantwoord alle vragen"}
       </button>
     </div>

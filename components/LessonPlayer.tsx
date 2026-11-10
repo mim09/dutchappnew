@@ -63,12 +63,18 @@ export default function LessonPlayer({ lesson }: { lesson: LessonData }) {
   }, [done]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+      <div className="sticky z-20 -mx-4 bg-[var(--bg)]/90 px-4 py-2 backdrop-blur md:static md:mx-0 md:px-0" style={{ top: "calc(env(safe-area-inset-top) + 3.2rem)" }}>
+        <div className="h-2 overflow-hidden rounded-full bg-[var(--line)]">
+          <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all" style={{ width: `${exercises.length ? Math.round((Object.keys(results).length / exercises.length) * 100) : 100}%` }} />
+        </div>
+        <p className="mt-1 text-[11px] text-[var(--muted)]">{Object.keys(results).length} van {exercises.length} oefeningen</p>
+      </div>
       <div>
-        <h1 className="text-2xl font-semibold">{lesson.title}</h1>
-        <p className="text-sm text-neutral-500">{lesson.body.intro}</p>
+        <h1>{lesson.title}</h1>
+        <p className="mt-2 text-sm text-[var(--muted)]">{lesson.body.intro}</p>
         {lesson.body.generated && (
-          <p className="text-xs mt-2 rounded border border-amber-500 p-2">Deze les is door AI gemaakt en nog niet door een docent gecontroleerd.</p>
+          <p className="text-xs mt-2 rounded-xl border border-amber-500 bg-amber-500/10 p-2.5">Deze les is door AI gemaakt en nog niet door een docent gecontroleerd.</p>
         )}
       </div>
 
@@ -80,7 +86,7 @@ export default function LessonPlayer({ lesson }: { lesson: LessonData }) {
               {s.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
               <ul className="space-y-2">
                 {s.examples?.map((e, i) => (
-                  <li key={i} className="rounded border border-neutral-200 dark:border-neutral-800 p-3 text-sm">
+                  <li key={i} className="card card-sm text-sm">
                     {e.wrong && <div className="text-red-600 line-through">{e.wrong}</div>}
                     <div className="font-medium flex items-center gap-2">{e.nl} <AudioButton text={e.nl} label="Luister" /></div>
                     {e.note && <div className="text-neutral-500">{e.note}</div>}
@@ -107,7 +113,7 @@ export default function LessonPlayer({ lesson }: { lesson: LessonData }) {
                 ))}
               </ul>
               {s.expressions && (
-                <div className="rounded border border-neutral-200 dark:border-neutral-800 p-3 text-sm space-y-2">
+                <div className="card card-sm text-sm space-y-2">
                   <h3 className="font-semibold">Uitdrukkingen</h3>
                   {s.expressions.map((e, i) => (
                     <div key={i}>
@@ -137,13 +143,13 @@ export default function LessonPlayer({ lesson }: { lesson: LessonData }) {
         <div className="space-y-2">
           <p className="text-sm text-green-700">Les opgeslagen ({Math.round(score * 100)}% goed).</p>
           <button onClick={() => { router.push("/today"); router.refresh(); }}
-            className="rounded bg-black text-white px-4 py-2 dark:bg-white dark:text-black">Naar de volgende les</button>
+            className="btn btn-primary">Naar de volgende les</button>
         </div>
       )}
       {save === "error" && (
         <div className="space-y-2">
           <p className="text-sm text-red-600">{saveErr}</p>
-          <button onClick={persist} className="rounded border px-4 py-2 text-sm">Opnieuw proberen</button>
+          <button onClick={persist} className="btn btn-ghost">Opnieuw proberen</button>
         </div>
       )}
     </div>
@@ -152,7 +158,7 @@ export default function LessonPlayer({ lesson }: { lesson: LessonData }) {
 
 export function ExerciseCard({ ex, result, onAnswer }: { ex: Exercise; result?: Result; onAnswer: (g: string | number) => void }) {
   const [text, setText] = useState("");
-  const box = "rounded border border-neutral-200 dark:border-neutral-800 p-4 space-y-2";
+  const box = "card space-y-2";
   return (
     <div className={box}>
       {ex.kind === "dictation" ? (
@@ -166,17 +172,16 @@ export function ExerciseCard({ ex, result, onAnswer }: { ex: Exercise; result?: 
       {ex.kind === "mcq" &&
         ex.options.map((o, i) => (
           <button key={i} disabled={!!result} onClick={() => onAnswer(i)}
-            className={`block w-full text-left rounded border p-2 text-sm ${
-              result && i === ex.answer ? "border-green-600" : result && result.given === String(i) ? "border-red-600" : "border-neutral-300 dark:border-neutral-700"}`}>
+            className={`choice ${result && i === ex.answer ? "choice-ok" : result && result.given === String(i) ? "choice-bad" : ""}`}>
             {o}
           </button>
         ))}
       {ex.kind !== "mcq" && (
         <div className="flex gap-2">
           <input value={text} disabled={!!result} onChange={(e) => setText(e.target.value)}
-            className="flex-1 rounded border p-2 text-sm dark:bg-neutral-900" placeholder="Antwoord" />
+            className="flex-1 field" placeholder="Antwoord" />
           <button disabled={!!result || !text.trim()} onClick={() => onAnswer(text)}
-            className="rounded border px-3 text-sm">Controleer</button>
+            className="btn btn-ghost">Controleer</button>
         </div>
       )}
       {result && (

@@ -10,13 +10,13 @@ const BASE: Record<Skill, number> = {
 };
 
 const LABELS: Record<Skill, string> = {
-  input: "Comprehensible input",
-  listening: "Listening",
-  vocabulary: "Vocabulary",
-  grammar: "Grammar",
-  speaking: "Speaking",
-  reading_writing: "Reading or writing",
-  revision: "Revision",
+  input: "Input: lezen en kijken",
+  listening: "Luisteren",
+  vocabulary: "Woordenschat",
+  grammar: "Grammatica",
+  speaking: "Spreken",
+  reading_writing: "Lezen of schrijven",
+  revision: "Herhalen",
 };
 
 // weakness: 0 (strong) to 1 (weak) per skill, derived from recent errors and scores

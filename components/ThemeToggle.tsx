@@ -13,7 +13,7 @@ export default function ThemeToggle() {
     <div className="flex gap-2 text-sm">
       {["system", "light", "dark"].map((v) => (
         <button key={v} onClick={() => choose(v)}
-          className={`rounded border px-3 py-1 ${t === v ? "bg-black text-white dark:bg-white dark:text-black" : ""}`}>{v}</button>
+          className={`btn btn-ghost !min-h-0 !py-1.5 ${t === v ? "!bg-[var(--brand)] !text-white !border-transparent" : ""}`}>{v}</button>
       ))}
     </div>
   );

@@ -44,7 +44,7 @@ export default function AssessmentRunner({ id, items }: { id: string; items: Ite
   return (
     <div className="space-y-4 max-w-2xl">
       {items.map((it, i) => (
-        <div key={i} className="rounded border border-neutral-200 dark:border-neutral-800 p-4 space-y-2">
+        <div key={i} className="card space-y-2">
           <div className="text-xs text-neutral-500">Vraag {i + 1} van {items.length}</div>
           {it.kind === "dictation" ? (
             <div className="flex items-center gap-3 text-sm">Luister en schrijf op wat je hoort. <AudioButton text={it.text} voice={it.voice} label="Luister" /></div>
@@ -56,12 +56,12 @@ export default function AssessmentRunner({ id, items }: { id: string; items: Ite
           ))}
           {it.kind !== "mcq" && (
             <input value={String(answers[i] ?? "")} onChange={(e) => set(i, e.target.value)}
-              className="w-full rounded border p-2 text-sm dark:bg-neutral-900" placeholder="Antwoord" />
+              className="w-full field" placeholder="Antwoord" />
           )}
         </div>
       ))}
       <button disabled={busy || answered < items.length} onClick={submit}
-        className="rounded bg-black text-white px-4 py-2 text-sm disabled:opacity-40 dark:bg-white dark:text-black">
+        className="btn btn-primary">
         {busy ? "Beoordelen..." : answered < items.length ? `Nog ${items.length - answered} vragen` : "Lever in"}
       </button>
       {err && <p className="text-sm text-red-600">{err}</p>}
@@ -71,7 +71,7 @@ export default function AssessmentRunner({ id, items }: { id: string; items: Ite
 
 function Table({ title, data }: { title: string; data: Result["skills"] }) {
   return (
-    <div className="rounded border border-neutral-200 dark:border-neutral-800 p-3 text-sm">
+    <div className="card card-sm text-sm">
       <h3 className="font-semibold mb-1">{title}</h3>
       {Object.entries(data).map(([k, v]) => (
         <div key={k} className="flex justify-between"><span>{k}</span><span>{v.correct} van {v.total}</span></div>
